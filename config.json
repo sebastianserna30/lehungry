@@ -1,0 +1,5 @@
+{
+    "leader_port": "/dev/ttyACM1",
+    "follower_port": "/dev/ttyACM0",
+    "robot_cameras": "{wrist: {type: opencv, index_or_path: 10, width: 640, height: 480, fps: 30},front: {type: intelrealsense, serial_number_or_name: 218722271390, width: 640, height: 480, fps: 30, use_depth: true}}"
+}
