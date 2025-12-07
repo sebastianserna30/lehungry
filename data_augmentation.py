@@ -3,14 +3,31 @@ from datasets import load_dataset, Dataset, concatenate_datasets
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load environment variables
-load_dotenv()
+# Secure configuration loading
+# We explicitly load from .secrets to avoid confusion with other env files
+SECRETS_FILE = ".secrets"
+
+if not os.path.exists(SECRETS_FILE):
+    print(f"\n[!] CRITICAL ERROR: Secrets file '{SECRETS_FILE}' not found.")
+    print("    Please create this file and add your OPENAI_API_KEY and HF_TOKEN.")
+    print("    See .secrets.template for an example.")
+    exit(1)
+
+load_dotenv(dotenv_path=SECRETS_FILE, override=True)
 
 # Configuration
-REPO_ID = "lehungry-robotum/sebas_test" # Dataset name
+REPO_ID = "lehungry-robotum/sebas_test" # Default/Fallback
 TASK_COLUMN = "single_task"                      # The column to augment
 HF_TOKEN = os.environ.get("HF_TOKEN")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+if not OPENAI_API_KEY or "ENTER_KEY" in OPENAI_API_KEY:
+    print(f"\n[!] CRITICAL ERROR: OPENAI_API_KEY is missing or invalid in '{SECRETS_FILE}'.")
+    exit(1)
+
+if not HF_TOKEN or "ENTER_KEY" in HF_TOKEN:
+    print(f"\n[!] WARNING: HF_TOKEN is possibly missing or invalid in '{SECRETS_FILE}'.")
+    print("    Pushing to the hub might fail.")
 
 # Initialize OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
