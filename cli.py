@@ -1,5 +1,7 @@
 #!/home/sebas/miniforge3/envs/lerobot/bin/python
 import os
+import lerobot
+from huggingface_hub import HfApi
 import json
 import sys
 import serial.tools.list_ports
@@ -267,6 +269,19 @@ def run_record(config):
     
     try:
         subprocess.run(cmd, check=True)
+
+        if resume_flag == "false":
+            try:
+                # Use the actual lerobot version
+                version = f"v{lerobot.__version__}"
+                repo_type = "dataset"
+                print(f"\n[TAGGING] Creating tag '{version}' for repo '{repo_id}'...")
+                
+                hub_api = HfApi()
+                hub_api.create_tag(repo_id=repo_id, tag=version, repo_type=repo_type)
+                print(f"[TAGGING] Successfully tagged {repo_id} with {version}")
+            except Exception as e:
+                print(f"\n[TAGGING] Warning: Failed to create tag. Error: {e}")
     except subprocess.CalledProcessError as e:
         print(f"\nRecording ended/failed with exit code {e.returncode}")
     except KeyboardInterrupt:
